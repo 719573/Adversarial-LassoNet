@@ -26,11 +26,12 @@ class Config:
     hidden_dim: int = 256
     device: str = "cuda" if torch.cuda.is_available() else "cpu"
 
-    # Colored MNIST 常见设置：
-    # 先对标签加噪声，再让颜色与 noisy label 相关。
+    # Standard Colored MNIST setup:
+    # first inject label noise, then correlate color with the noisy label.
     label_flip_prob: float = 0.25
 
-    # 训练环境越多，越容易检验模型是否真的在找稳定特征。
+    # More training environments make it easier to test whether the model
+    # is actually learning stable features.
     train_env_probs: Tuple[float, ...] = (0.1, 0.2, 0.3)
     id_env_prob: float = 0.2
     ood_env_prob: float = 0.9
@@ -46,15 +47,16 @@ class Config:
 
 class ColoredMNISTEnv(Dataset):
     """
-    构造单个 environment 的 Colored MNIST。
+    Build one Colored MNIST environment.
 
-    因果语义上可以理解为：
+    In causal terms, this can be interpreted as:
     digit -> label
     label -> observed noisy_label
     noisy_label -> color
 
-    其中 color 只是在不同环境里和标签呈现不同相关性，
-    因此它是典型的伪相关特征；数字形状才是相对稳定的特征。
+    Here, color only exhibits different correlations with the label across
+    environments, so it is a typical spurious feature, while digit shape is
+    the relatively stable feature.
     """
 
     def __init__(
@@ -425,12 +427,12 @@ def main() -> None:
     print_final_summary("IRM", irm_metrics)
 
     print("\nInterpretation:")
-    print("1. ID 评估看模型在相近相关性环境中的表现。")
-    print("2. OOD 评估看颜色相关性反转后，模型是否仍能依赖数字形状。")
-    print("3. Intervention 评估使用近似独立颜色环境，检验模型对颜色干预是否稳定。")
-    print("4. color_flip_change 越低，说明预测越不依赖颜色通道。")
-    print("5. 该实验可以支持“模型学习到了更稳定的跨环境特征”的说法。")
-    print("6. 但它仍不能单独证明模型具备一般性的因果发现或因果推断能力。")
+    print("1. ID evaluation measures performance in environments with similar correlations.")
+    print("2. OOD evaluation checks whether the model still relies on digit shape after color correlation is reversed.")
+    print("3. Intervention evaluation uses an approximately independent color environment to test robustness to color interventions.")
+    print("4. Lower color_flip_change indicates that predictions depend less on the color channel.")
+    print("5. This experiment can support the claim that the model learns more stable cross-environment features.")
+    print("6. However, it still cannot by itself prove general causal discovery or causal inference capability.")
 
 
 if __name__ == "__main__":

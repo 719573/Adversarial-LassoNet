@@ -1,28 +1,37 @@
 # Adversarial LassoNet
 
-面向论文配套代码公开的 Adversarial / SAM-style LassoNet 实验仓库，包含主基准实验、SERS 二分类实验、Colored MNIST 对比和消融分析。
+This repository contains the experimental code for Adversarial / SAM-style LassoNet. It includes the main benchmark study, the SERS binary classification experiment, the Colored MNIST spurious-correlation study, and ablation analyses.
 
-本仓库包含一份 vendored `lassonet` 实现，遵循 MIT License，版权归原作者所有：
-Ismael Lemhadri et al.，上游项目见 <https://github.com/lasso-net/lassonet>。相关许可证已保存在 `src/models/lassonet/` 和 `src/models/lassonet_sers/`。
+This repository includes a vendored implementation of `lassonet`, released under the MIT License and credited to the original authors:
+Ismael Lemhadri et al. The upstream project is available at <https://github.com/lasso-net/lassonet>. The corresponding license files are preserved under `src/models/lassonet/` and `src/models/lassonet_sers/`.
 
-`src/utils/data_utils.py` 中部分表格数据加载逻辑参考了 Concrete Autoencoders：
-<https://github.com/mfbalin/Concrete-Autoencoders>。
+Part of the tabular data loading logic in `src/utils/data_utils.py` is adapted with reference to Concrete Autoencoders:
+<https://github.com/mfbalin/Concrete-Autoencoders>.
 
-## 项目结构
+## Overview
+
+The codebase is organized around four experimental settings:
+
+- Main benchmark experiments on SERS and tabular/image benchmarks
+- Spurious-correlation evaluation on Colored MNIST
+- Ablation studies for adversarial and regularization components
+- Sensitivity analysis with respect to `adv_alpha`
+
+## Repository Structure
 
 ```text
 Adversarial-LassoNet/
-|- configs/         # 实验默认配置
-|- data/            # 数据说明与本地数据目录
-|- docs/            # 复现与项目文档
-|- experiments/     # 对外推荐的实验入口
-|- outputs/         # 结果输出目录
-|- scripts/         # 兼容旧工作流的脚本入口
-|- src/             # 核心模型、数据与分析代码
-|- pyproject.toml   # 可安装包配置
+|- configs/         # Default experiment configurations
+|- data/            # Data notes and expected local directory layout
+|- docs/            # Reproduction and project documentation
+|- experiments/     # Primary experiment entry points
+|- outputs/         # Default output location
+|- scripts/         # Legacy-compatible script entry points
+|- src/             # Core models, data utilities, and analysis code
+|- pyproject.toml   # Package configuration
 ```
 
-## 安装
+## Installation
 
 ```bash
 python -m venv .venv
@@ -37,15 +46,15 @@ Windows:
 pip install -e .
 ```
 
-推荐环境：
+Recommended environment:
 
-- Python 3.10 或 3.11
+- Python 3.10 or 3.11
 - PyTorch 2.x
-- CUDA 11.8+（可选；CPU 也可运行，但 benchmark 会更慢）
+- CUDA 11.8+ (optional; CPU also works, but benchmark runs will be slower)
 
-## 数据准备
+## Data Preparation
 
-默认数据根目录是 `data/raw/`，也可以通过环境变量覆盖：
+The default data root is `data/raw/`. It can be overridden with an environment variable:
 
 ```bash
 export LASSONET_DATA_DIR=/path/to/data/raw
@@ -57,7 +66,7 @@ Windows PowerShell:
 $env:LASSONET_DATA_DIR = "D:\\datasets\\adversarial-lassonet"
 ```
 
-推荐目录结构：
+Recommended directory structure:
 
 ```text
 data/
@@ -79,28 +88,28 @@ data/
 |  |- torchvision/
 ```
 
-数据集获取链接与说明请见 [data/README.md](data/README.md)。
+See [data/README.md](data/README.md) for expected files and release notes.
 
-说明：
+Notes:
 
-- `MNIST` 和 `FashionMNIST` 会由 `torchvision` 自动下载到 `data/raw/torchvision/`
-- 当前仓库中仍保留了 `data/sers/` 示例 CSV；在正式公开前，请先确认你是否拥有重新分发权限
+- `MNIST` and `FashionMNIST` are downloaded automatically by `torchvision` into `data/raw/torchvision/`
+- The repository currently includes example CSV files under `data/sers/`; redistribution constraints should be reviewed before public release
 
-## 快速开始
+## Quick Start
 
-5 分钟 smoke test：
+Minimal smoke test:
 
 ```bash
 python experiments/exp1_main_benchmark/run_sers.py --mode clean --seed 42
 ```
 
-主实验：
+Main benchmark:
 
 ```bash
 python experiments/exp1_main_benchmark/run_benchmark.py
 ```
 
-其它实验：
+Additional experiments:
 
 ```bash
 python experiments/exp2_spurious_colored_mnist/run_comparison.py
@@ -108,31 +117,25 @@ python experiments/exp3_ablation/run_ablation.py --datasets MICE --ablation all 
 python experiments/exp4_alpha_sensitivity/run_alpha_sweep.py --dataset MICE --runs 5
 ```
 
-## 输出
+## Outputs
 
-默认结果会写入：
+By default, results are written to:
 
 - `outputs/exp1_main_benchmark/`
 - `outputs/exp2_spurious_colored_mnist/`
 - `outputs/exp3_ablation/`
 - `outputs/exp4_alpha_sensitivity/`
 
-## 可复现性说明
+## Reproducibility
 
-- 当前 `configs/exp1_main_benchmark/` 已接入 `run_sers.py` 和 `run_benchmark.py`
-- `scripts/` 目录仍保留，用于兼容旧命令；对外使用优先选择 `experiments/`
-- 若需要完全复现实验，请同时记录 Python、PyTorch、CUDA、随机种子和数据目录
+- `configs/exp1_main_benchmark/` is currently wired into `run_sers.py` and `run_benchmark.py`
+- The `scripts/` directory is retained for backward compatibility; `experiments/` is the recommended public interface
+- Full reproduction should record Python, PyTorch, CUDA, random seeds, and the data directory used for each run
 
-## 引用
+## Citation
 
-如果你使用了本仓库，请至少引用原始 LassoNet 工作，并在你的论文中注明本仓库的实验实现来源。
-
-后续建议补充：
-
-- `CITATION.cff`
-- 论文 BibTeX
-- 英文版 README
+If this repository is used in academic work, please cite the original LassoNet paper and acknowledge this repository as the source of the experimental implementation.
 
 ## License
 
-本仓库主代码采用 MIT License，见 [LICENSE](LICENSE)。
+The main code in this repository is released under the MIT License. See [LICENSE](LICENSE).

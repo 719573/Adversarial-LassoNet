@@ -1,1 +1,1 @@
-"""Top-level models package for installed adversarial_lassonet distributions."""
+"""Model and baseline implementations used across experiment scripts."""

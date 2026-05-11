@@ -1,12 +1,3 @@
-"""
-Compute empirical NTK spectra for LassoNet checkpoints on Colored MNIST.
-
-The script is intentionally evaluation-only: it loads an existing checkpoint,
-builds a small evaluation subset, computes per-sample Jacobians of a scalar
-model output with respect to all trainable parameters, and reports the spectrum
-of the empirical NTK matrix Theta = J J^T.
-"""
-
 import argparse
 import csv
 import json
@@ -26,16 +17,15 @@ import torch
 from torch import nn
 
 ROOT = Path(__file__).resolve().parents[2]
-SRC_DIR = ROOT / "src"
-MODELS_DIR = SRC_DIR / "models"
-UTILS_DIR = SRC_DIR / "utils"
+root_text = str(ROOT)
+if root_text not in sys.path:
+    sys.path.insert(0, root_text)
 
-for path in (MODELS_DIR, UTILS_DIR):
-    path_text = str(path)
-    if path_text not in sys.path:
-        sys.path.insert(0, path_text)
+from src.utils.path_setup import add_project_src_paths  # noqa: E402
 
-from data_utils import load_dataset
+add_project_src_paths(ROOT)
+
+from utils.data_utils import load_dataset
 from lassonet import LassoNetClassifier
 from lassonet.interfaces import HistoryItem
 

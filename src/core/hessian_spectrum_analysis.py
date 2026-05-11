@@ -1,23 +1,3 @@
-"""
-Estimate Hessian spectrum statistics for LassoNet checkpoints on Colored MNIST.
-
-The script reuses the current project training losses:
-- vanilla LassoNet: classification loss plus configured weight penalties;
-- adv_before_ablation: the same mixed clean/adversarial loss used in training.
-
-It computes Hessian-vector products with PyTorch autograd, estimates:
-- largest eigenvalue via power iteration;
-- Hessian trace via Hutchinson's estimator;
-- average curvature = trace(H) / input_feature_count.
-
-It also runs a small Lanczos routine to obtain a Krylov approximation of the
-eigenvalue distribution, then saves:
-- JSON summary;
-- one CSV row;
-- Lanczos eigenvalue curve PNG;
-- Hessian eigenvalue density PNG.
-"""
-
 import argparse
 import csv
 import json
@@ -39,17 +19,16 @@ from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
 ROOT = Path(__file__).resolve().parents[2]
-SRC_DIR = ROOT / "src"
-MODELS_DIR = SRC_DIR / "models"
-UTILS_DIR = SRC_DIR / "utils"
+root_text = str(ROOT)
+if root_text not in sys.path:
+    sys.path.insert(0, root_text)
 
-for path in (MODELS_DIR, UTILS_DIR):
-    path_text = str(path)
-    if path_text not in sys.path:
-        sys.path.insert(0, path_text)
+from src.utils.path_setup import add_project_src_paths  # noqa: E402
+
+add_project_src_paths(ROOT)
 
 from adversarial_lassonet import LassoNetSAMAligned
-from data_utils import load_dataset
+from utils.data_utils import load_dataset
 from lassonet import LassoNetClassifier
 from lassonet.interfaces import HistoryItem
 

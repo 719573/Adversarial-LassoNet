@@ -8,17 +8,16 @@ import numpy as np
 import torch
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC_DIR = ROOT / "src"
-MODELS_DIR = SRC_DIR / "models"
-UTILS_DIR = SRC_DIR / "utils"
+root_text = str(ROOT)
+if root_text not in sys.path:
+    sys.path.insert(0, root_text)
 
-for path in (MODELS_DIR, UTILS_DIR):
-    path_text = str(path)
-    if path_text not in sys.path:
-        sys.path.insert(0, path_text)
+from src.utils.path_setup import add_project_src_paths  # noqa: E402
 
-from data_utils import load_dataset
-from deep_lasso_tabular import DeepLassoTabularPipeline
+add_project_src_paths(ROOT)
+
+from models.deep_lasso_tabular import DeepLassoTabularPipeline
+from utils.data_utils import load_dataset
 DATASET_ALIAS = {
     "mnist": "MNIST",
     "minst": "MNIST",

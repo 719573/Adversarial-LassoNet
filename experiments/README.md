@@ -1,14 +1,14 @@
-## 论文实验入口
+## Paper Experiment Entry Points
 
-本目录按论文实验组织，而不是按模型脚本组织。
+This directory is organized by experiment setting rather than by model implementation.
 
-- `exp1_main_benchmark/`：主实验，在 SERS 和 benchmark 数据集上比较 vanilla LassoNet、adv-LassoNet、FISTA-Net、Deep-Lasso。
-- `exp2_spurious_colored_mnist/`：Colored MNIST 上的虚假关联实验。
-- `exp3_ablation/`：消融实验。
-- `exp4_alpha_sensitivity/`：`alpha` 敏感性实验。
+- `exp1_main_benchmark/`: Main benchmark comparing vanilla LassoNet, adv-LassoNet, FISTA-Net, and Deep-Lasso on SERS and benchmark datasets.
+- `exp2_spurious_colored_mnist/`: Spurious correlation experiment on Colored MNIST.
+- `exp3_ablation/`: Ablation experiment.
+- `exp4_alpha_sensitivity/`: `alpha` sensitivity experiment.
 
-每个子目录下都放：
+Each subdirectory typically contains:
 
-- `run_*.py`：实验主入口。
-- `README.md`：该实验的运行说明。
-- 可选的 `summarize.py` / `plot_*.py`：结果汇总和绘图脚本。
+- `run_*.py`: Main entry point for the experiment
+- `README.md`: Experiment-specific usage notes
+- Optional `summarize.py` / `plot_*.py`: Result aggregation and plotting utilities

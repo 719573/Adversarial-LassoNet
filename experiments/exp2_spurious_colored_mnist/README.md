@@ -1,8 +1,8 @@
-## 实验 2：Colored MNIST 虚假关联
+## Experiment 2: Colored MNIST Spurious Correlation
 
-本实验比较 vanilla `LassoNet` 和 `adv-LassoNet` 在 Colored MNIST 上面对虚假颜色关联时的表现。
+This experiment evaluates vanilla `LassoNet` and `adv-LassoNet` on Colored MNIST under spurious color-label correlations.
 
-运行示例：
+Example command:
 
 ```bash
 python experiments/exp2_spurious_colored_mnist/run_comparison.py \

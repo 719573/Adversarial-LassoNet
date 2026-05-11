@@ -1,6 +1,6 @@
-## 数据目录
+## Data Directory
 
-推荐结构：
+Recommended layout:
 
 ```text
 data/
@@ -15,13 +15,13 @@ data/
 |- README.md
 ```
 
-说明：
+Notes:
 
-- `raw/` 存放原始数据，不建议直接纳入公开仓库版本控制
-- `processed/` 存放缓存、中间结果和切分文件
-- 如果设置了 `LASSONET_DATA_DIR`，代码会优先从该目录读取数据
+- `raw/` stores raw datasets and is generally not intended for public version control
+- `processed/` stores caches, intermediate artifacts, and split files
+- If `LASSONET_DATA_DIR` is set, the code reads data from that location with priority
 
-## 各数据集期望文件
+## Expected Files Per Dataset
 
 SERS:
 
@@ -39,7 +39,7 @@ ISOLET:
 
 COIL:
 
-- `coil-20-proc/obj1__0.png` 等图像文件
+- image files such as `coil-20-proc/obj1__0.png`
 
 Activity:
 
@@ -50,14 +50,14 @@ Activity:
 
 Torchvision:
 
-- `torchvision/` 由 `MNIST` 和 `FashionMNIST` 自动下载生成
+- `torchvision/` is created automatically by downloading `MNIST` and `FashionMNIST`
 
-## 公开分发提醒
+## Data Release Notes
 
-`data/sers/` 当前存在已提交的 CSV 文件，但这与“默认不随仓库分发原始数据”的目标不一致。
+`data/sers/` currently contains committed CSV files, which is inconsistent with the goal of not distributing raw data with the repository by default.
 
-正式开源前请确认：
+Before a public release, the following points should be reviewed:
 
-- 这些 CSV 是否允许重新分发
-- 是否涉及患者隐私或伦理审批约束
-- 如果不能公开，建议移除仓库内文件并改为外部下载链接，例如 Zenodo 或 Figshare
+- Whether these CSV files may be redistributed
+- Whether they are subject to patient-privacy or ethics-approval constraints
+- If public redistribution is not allowed, replace repository copies with external download links such as Zenodo or Figshare

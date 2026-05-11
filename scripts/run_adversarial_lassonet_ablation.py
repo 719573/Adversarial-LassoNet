@@ -9,16 +9,15 @@ from typing import Dict, List
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC_DIR = ROOT / "src"
-MODELS_DIR = SRC_DIR / "models"
-UTILS_DIR = SRC_DIR / "utils"
+root_text = str(ROOT)
+if root_text not in sys.path:
+    sys.path.insert(0, root_text)
 
-for path in (MODELS_DIR, UTILS_DIR):
-    path_text = str(path)
-    if path_text not in sys.path:
-        sys.path.insert(0, path_text)
+from src.utils.path_setup import add_project_src_paths  
 
-from adversarial_lassonet import (  # noqa: E402
+add_project_src_paths(ROOT)
+
+from adversarial_lassonet import (  
     AdversarialLassoNetConfig,
     build_adv_arg_parser,
     canonical_dataset_name,
@@ -27,7 +26,7 @@ from adversarial_lassonet import (  # noqa: E402
     resolve_device,
     train_adversarial_lassonet_once,
 )
-from data_utils import load_dataset  # noqa: E402
+from utils.data_utils import load_dataset  
 
 
 @dataclass(frozen=True)

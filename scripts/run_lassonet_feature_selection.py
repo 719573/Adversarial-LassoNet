@@ -8,16 +8,15 @@ import torch
 from sklearn.model_selection import train_test_split
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC_DIR = ROOT / "src"
-MODELS_DIR = SRC_DIR / "models"
-UTILS_DIR = SRC_DIR / "utils"
+root_text = str(ROOT)
+if root_text not in sys.path:
+    sys.path.insert(0, root_text)
 
-for path in (MODELS_DIR, UTILS_DIR):
-    path_text = str(path)
-    if path_text not in sys.path:
-        sys.path.insert(0, path_text)
+from src.utils.path_setup import add_project_src_paths  # noqa: E402
 
-from data_utils import load_dataset
+add_project_src_paths(ROOT)
+
+from utils.data_utils import load_dataset
 from lassonet import LassoNetClassifier
 from lassonet.utils import eval_on_path
 
@@ -49,7 +48,7 @@ valid = ", ".join(
 
 
 def save_sparse_checkpoint(dataset, seed, selected_features, path_sparse):
-    """保存带 selected_mask 的稀疏 checkpoint，供 NTK 谱分析脚本使用。"""
+    """Save a sparse checkpoint with selected_mask for use by the NTK spectrum analysis script."""
     save_pkl_dir.mkdir(parents=True, exist_ok=True)
     payload = {
         "dataset": dataset,

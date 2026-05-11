@@ -1,12 +1,3 @@
-"""在 MICE 数据集上扫描 adv_alpha 的实验脚本。
-
-复用 ``adversarial_lassonet.py`` 中的 ``LassoNetSAMAligned`` 训练逻辑：
-对每个 alpha 候选值各跑 ``--runs`` 次（默认 5 次，使用不同随机种子保证
-随机初始化与 mini-batch 顺序的差异），记录 val_acc、test_acc 以及不同
-随机种子之间所选特征集合的平均 pairwise Jaccard Index，最后把指标随
-alpha 变化的折线图（accuracy 与 Jaccard）输出到磁盘。
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -21,17 +12,16 @@ import torch
 from sklearn.model_selection import train_test_split
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC_DIR = ROOT / "src"
-MODELS_DIR = SRC_DIR / "models"
-UTILS_DIR = SRC_DIR / "utils"
+root_text = str(ROOT)
+if root_text not in sys.path:
+    sys.path.insert(0, root_text)
 
-for path in (MODELS_DIR, UTILS_DIR):
-    path_text = str(path)
-    if path_text not in sys.path:
-        sys.path.insert(0, path_text)
+from src.utils.path_setup import add_project_src_paths  # noqa: E402
+
+add_project_src_paths(ROOT)
 
 from adversarial_lassonet import LassoNetSAMAligned, canonical_dataset_name, set_seed
-from data_utils import load_dataset
+from utils.data_utils import load_dataset
 from lassonet.utils import eval_on_path
 
 
@@ -42,8 +32,8 @@ def train_once(
     args: argparse.Namespace,
     device: torch.device,
 ) -> Tuple[np.ndarray, int, float, float]:
-    """复用 adversarial_lassonet.py 中两阶段训练流程，
-    并额外返回 selected_mask 用于后续 Jaccard 计算。"""
+    """Reuse the two-stage training pipeline from adversarial_lassonet.py
+    and additionally return selected_mask for later Jaccard computation."""
 
     set_seed(seed)
 
@@ -87,7 +77,7 @@ def train_once(
     selected_count = int(selected_mask.sum())
     if selected_count == 0:
         raise RuntimeError(
-            f"{dataset}: 选中 0 个特征，请减小 --k 或调整稀疏强度。"
+            f"{dataset}: selected 0 features; please reduce --k or adjust the sparsity strength."
         )
 
     X_train_sel = X_train[:, selected_mask]
@@ -122,7 +112,7 @@ def train_once(
 
 
 def avg_pairwise_jaccard(masks: List[np.ndarray]) -> float:
-    """计算多次 run 的 selected_mask 之间的平均 pairwise Jaccard 相似度。"""
+    """Compute the average pairwise Jaccard similarity among selected_mask values across runs."""
 
     if len(masks) < 2:
         return 1.0
@@ -140,12 +130,12 @@ def avg_pairwise_jaccard(masks: List[np.ndarray]) -> float:
 
 def parse_sweep_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="在 MICE 上对 adv_alpha 做扫描实验，记录 val/test acc 与平均 Jaccard。"
+        description="Run an adv_alpha sweep on MICE and record val/test accuracy together with average Jaccard."
     )
     parser.add_argument("--dataset", type=str, default="MICE")
-    parser.add_argument("--runs", type=int, default=5, help="每个 alpha 重复训练的次数。")
+    parser.add_argument("--runs", type=int, default=5, help="Number of repeated training runs for each alpha.")
     parser.add_argument("--base-seed", type=int, default=42)
-    parser.add_argument("--k", type=int, default=50, help="目标选中特征数。")
+    parser.add_argument("--k", type=int, default=50, help="Target number of selected features.")
     parser.add_argument("--lasso-epochs", type=int, default=1000)
     parser.add_argument("--batch-size", type=int, default=512)
     parser.add_argument("--lasso-verbose", type=int, default=0)
@@ -155,7 +145,7 @@ def parse_sweep_args() -> argparse.Namespace:
         "--alphas",
         type=str,
         default="0.0,0.2,0.4,0.6,0.8,1.0",
-        help="候选 alpha 值，逗号分隔。",
+        help="Candidate alpha values, separated by commas.",
     )
     parser.add_argument("--device", type=str, default="auto", choices=["auto", "cpu", "cuda"])
     parser.add_argument("--output-dir", type=str, default="alpha_sweep_results")

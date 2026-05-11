@@ -43,7 +43,7 @@ ALL_DATASETS = [
 
 
 class AdversarialLassoNetClassifier(LassoNetClassifier):
-    """改进的对抗扰动 LassoNet，支持稳定性损失、梯度范数惩罚和 prox 调整。"""
+    """Enhanced adversarial-perturbation LassoNet with stability loss, gradient-norm penalty, and prox adjustment."""
 
     def __init__(
         self,

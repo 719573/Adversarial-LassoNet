@@ -9,19 +9,18 @@ import torch
 from sklearn.model_selection import train_test_split
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC_ROOT = ROOT / "src"
-for path in (ROOT, SRC_ROOT):
-    path_text = str(path)
-    if path_text not in sys.path:
-        sys.path.insert(0, path_text)
+root_text = str(ROOT)
+if root_text not in sys.path:
+    sys.path.insert(0, root_text)
+
+from src.utils.path_setup import add_project_src_paths
+
+add_project_src_paths(ROOT)
 
 from adversarial_lassonet.paths import OUTPUTS_ROOT, ensure_directory
-from src.utils.path_setup import add_legacy_src_paths
 
-add_legacy_src_paths()
-
-from data_utils import load_dataset
-from fista_tabular import FISTATabularClassifier
+from models.fista_tabular import FISTATabularClassifier
+from utils.data_utils import load_dataset
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 

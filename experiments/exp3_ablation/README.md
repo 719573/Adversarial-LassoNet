@@ -1,8 +1,8 @@
-## 实验 3：消融实验
+## Experiment 3: Ablation
 
-本实验对应论文中的模块消融，分析不同正则项和对抗扰动组件对性能与特征稳定性的影响。
+This experiment contains the ablation studies reported in the paper and examines how regularization terms and adversarial-perturbation components affect performance and feature stability.
 
-运行示例：
+Example command:
 
 ```bash
 python experiments/exp3_ablation/run_ablation.py \

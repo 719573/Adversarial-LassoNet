@@ -1,17 +1,17 @@
-## 实验 1：主实验
+## Experiment 1: Main Benchmark
 
-本实验对应论文中的主结果：
+This directory contains the main benchmark experiments reported in the paper:
 
-- SERS 数据上的 `LassoNet` 与 `adv-LassoNet` 对比。
-- benchmark 数据集上 `LassoNet`、`adv-LassoNet`、`FISTA-Net`、`Deep-Lasso` 对比。
+- Comparison between `LassoNet` and `adv-LassoNet` on SERS data
+- Comparison among `LassoNet`, `adv-LassoNet`, `FISTA-Net`, and `Deep-Lasso` on benchmark datasets
 
-运行示例：
+Example commands:
 
 ```bash
 python experiments/exp1_main_benchmark/run_sers.py
 python experiments/exp1_main_benchmark/run_benchmark.py --datasets table2 --runs 5 --k 50
 ```
 
-建议将结果输出到：
+Default output directory:
 
 - `outputs/exp1_main_benchmark/`

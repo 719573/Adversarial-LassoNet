@@ -6,7 +6,7 @@ from lassonet.interfaces import HistoryItem
 
 
 class LassoNetSAMInputClassifier(LassoNetClassifier):
-    # LassoNet 二分类 + SAM 风格输入扰动训练
+    # LassoNet binary classification with SAM-style input perturbation training.
     
 
     def __init__(
@@ -36,7 +36,7 @@ class LassoNetSAMInputClassifier(LassoNetClassifier):
         patience=None,
     ):
         model = self.model
-        # 验证集目标：交叉熵 + 正则项
+        # Validation objective: cross-entropy plus regularization terms.
         def validation_obj():
             with torch.no_grad():
                 return (
@@ -62,7 +62,7 @@ class LassoNetSAMInputClassifier(LassoNetClassifier):
         else:
             randperm = torch.randperm
         batch_size = min(batch_size, n_train)
-        # 仅当 rho/alpha 都大于 0 时启用输入扰动
+        # Enable input perturbation only when both rho and alpha are positive.
         adv_enabled = self.adv_rho > 0 and self.adv_alpha > 0
 
         for epoch in range(epochs):
@@ -80,18 +80,18 @@ class LassoNetSAMInputClassifier(LassoNetClassifier):
                     yb = y_train[batch]
 
                     if adv_enabled:
-                        # 对输入开启梯度，计算 ∇x L_clean
+                        # Enable input gradients to compute ∇x L_clean.
                         Xb = Xb.detach().requires_grad_(True)
-                    # 原始样本交叉熵
+                    # Cross-entropy on clean samples.
                     crit_clean = self.criterion(model(Xb), yb)
                     crit = crit_clean
 
                     if adv_enabled:
-                        # SAM 风格一步扰动（L2 归一化）
+                        # One-step SAM-style perturbation with L2 normalization.
                         g = torch.autograd.grad(crit_clean, Xb, retain_graph=True)[0]
                         g_norm = torch.norm(g, p=2)
                         r = self.adv_rho * g / (g_norm + self.adv_delta)
-                        # 生成对抗样本并前向
+                        # Generate adversarial samples and run the forward pass.
                         Xb_adv = (Xb + r).detach()
                         crit_adv = self.criterion(model(Xb_adv), yb)
                         # Align with adv.py: mix clean and adversarial losses, both with gradients.
@@ -116,7 +116,7 @@ class LassoNetSAMInputClassifier(LassoNetClassifier):
                     return ans
 
                 optimizer.step(closure)
-                # LassoNet 层级近端更新（hier-prox）
+                # Hierarchical proximal update for the LassoNet layer.
                 model.prox(
                     lambda_=lambda_ * optimizer.param_groups[0]["lr"],
                     M=self.M,

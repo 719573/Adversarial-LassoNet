@@ -33,6 +33,18 @@ def _dataset_path(*parts: str) -> Path:
     return get_data_root().joinpath(*parts)
 
 
+def _resolve_first_existing_path(*candidates: tuple[str, ...]) -> Path:
+    for parts in candidates:
+        path = _dataset_path(*parts)
+        if path.exists():
+            return path
+    joined = ", ".join(str(_dataset_path(*parts)) for parts in candidates)
+    raise FileNotFoundError(
+        f"Required dataset artifact not found. Tried: {joined}\n"
+        "Please place the dataset under data/raw/ or set LASSONET_DATA_DIR."
+    )
+
+
 def _resolve_named_path(name: str) -> Path:
     path = _dataset_path(*DATASET_LOCATIONS[name])
     if not path.exists():
@@ -297,10 +309,34 @@ def load_mnist_two_digits(digit1, digit2):
 
 
 def load_activity():
-    x_train = np.loadtxt(_resolve_named_path("activity_x_train"), encoding="UTF-8")
-    x_test = np.loadtxt(_resolve_named_path("activity_x_test"), encoding="UTF-8")
-    y_train = np.loadtxt(_resolve_named_path("activity_y_train"), encoding="UTF-8") - 1
-    y_test = np.loadtxt(_resolve_named_path("activity_y_test"), encoding="UTF-8") - 1
+    x_train = np.loadtxt(
+        _resolve_first_existing_path(
+            DATASET_LOCATIONS["activity_x_train"],
+            ("dataset_uci", "final_X_train.txt"),
+        ),
+        encoding="UTF-8",
+    )
+    x_test = np.loadtxt(
+        _resolve_first_existing_path(
+            DATASET_LOCATIONS["activity_x_test"],
+            ("dataset_uci", "final_X_test.txt"),
+        ),
+        encoding="UTF-8",
+    )
+    y_train = np.loadtxt(
+        _resolve_first_existing_path(
+            DATASET_LOCATIONS["activity_y_train"],
+            ("dataset_uci", "final_y_train.txt"),
+        ),
+        encoding="UTF-8",
+    ) - 1
+    y_test = np.loadtxt(
+        _resolve_first_existing_path(
+            DATASET_LOCATIONS["activity_y_test"],
+            ("dataset_uci", "final_y_test.txt"),
+        ),
+        encoding="UTF-8",
+    ) - 1
 
     X = MinMaxScaler(feature_range=(0, 1)).fit_transform(np.concatenate((x_train, x_test)))
     x_train = X[: len(y_train)]

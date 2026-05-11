@@ -1,15 +1,15 @@
-## 项目概览
+## Project Overview
 
-本仓库围绕论文中的四个实验展开：
+This repository is organized around the four experimental components discussed in the paper:
 
-1. 主实验：SERS 与 benchmark 对比。
-2. 虚假关联实验：Colored MNIST。
-3. 消融实验。
-4. `alpha` 敏感性实验。
+1. Main experiment: SERS and benchmark comparison.
+2. Spurious correlation experiment: Colored MNIST.
+3. Ablation experiment.
+4. `alpha` sensitivity experiment.
 
-推荐读者按照如下顺序理解仓库：
+For readers approaching the codebase for the first time, the following order is recommended:
 
-1. 阅读根目录 `README.md`。
-2. 查看 `experiments/` 中四个实验入口。
-3. 查看 `src/models/` 中核心方法实现。
-4. 查看 `src/utils/` 与 `src/core/` 中数据、评估和分析代码。
+1. Read the root `README.md`.
+2. Inspect the four experiment entry points under `experiments/`.
+3. Review the core method implementations under `src/models/`.
+4. Review the data, evaluation, and analysis code under `src/utils/` and `src/core/`.

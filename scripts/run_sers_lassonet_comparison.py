@@ -20,19 +20,18 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC_ROOT = ROOT / "src"
-for path in (ROOT, SRC_ROOT):
-    path_text = str(path)
-    if path_text not in sys.path:
-        sys.path.insert(0, path_text)
+root_text = str(ROOT)
+if root_text not in sys.path:
+    sys.path.insert(0, root_text)
+
+from src.utils.path_setup import add_project_src_paths
+
+add_project_src_paths(ROOT)
 
 from adversarial_lassonet.paths import OUTPUTS_ROOT, ensure_directory, get_data_root
-from src.utils.path_setup import add_legacy_src_paths
-
-add_legacy_src_paths()
 
 from lassonet import LassoNetClassifier
-from lassonet_sam_input import LassoNetSAMInputClassifier
+from models.lassonet_sers.lassonet_sam_input import LassoNetSAMInputClassifier
 
 
 def set_seed(seed=42):

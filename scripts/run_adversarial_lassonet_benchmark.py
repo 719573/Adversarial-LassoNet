@@ -10,27 +10,27 @@ import torch
 from sklearn.model_selection import train_test_split
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC_ROOT = ROOT / "src"
-for path in (ROOT, SRC_ROOT):
-    path_text = str(path)
-    if path_text not in sys.path:
-        sys.path.insert(0, path_text)
+root_text = str(ROOT)
+if root_text not in sys.path:
+    sys.path.insert(0, root_text)
+
+from src.utils.path_setup import add_project_src_paths
+
+add_project_src_paths(ROOT)
 
 from adversarial_lassonet.paths import OUTPUTS_ROOT
-from src.utils.path_setup import add_legacy_src_paths
 
-add_legacy_src_paths()
-
-from adversarial_lassonet import (  # noqa: E402
+from adversarial_lassonet import (  
     AdversarialLassoNetClassifier,
     canonical_dataset_name,
     resolve_device,
     set_seed,
 )
-from data_utils import load_dataset  # noqa: E402
-from fista_tabular import FISTATabularClassifier  # noqa: E402
-from lassonet import LassoNetClassifier  # noqa: E402
-from lassonet.utils import eval_on_path  # noqa: E402
+from models.deep_lasso_tabular import DeepLassoTabularPipeline
+from models.fista_tabular import FISTATabularClassifier  
+from utils.data_utils import load_dataset 
+from lassonet import LassoNetClassifier  
+from lassonet.utils import eval_on_path  
 
 
 TABLE2_DATASETS = ["MICE", "MNIST", "MNIST-Fashion", "ISOLET", "COIL", "Activity"]
@@ -96,6 +96,20 @@ def parse_benchmark_args(return_parser: bool = False):
     parser.add_argument("--fista-lr", type=float, default=1e-3)
     parser.add_argument("--fista-weight-decay", type=float, default=1e-4)
     parser.add_argument("--fista-verbose", type=int, default=0)
+    parser.add_argument("--deep-lasso-epochs", type=int, default=200)
+    parser.add_argument("--deep-lasso-refit-epochs", type=int, default=200)
+    parser.add_argument("--deep-lasso-hidden-dim", type=int, default=0)
+    parser.add_argument("--deep-lasso-depth", type=int, default=2)
+    parser.add_argument("--deep-lasso-dropout", type=float, default=0.0)
+    parser.add_argument("--deep-lasso-lr", type=float, default=1e-3)
+    parser.add_argument("--deep-lasso-weight-decay", type=float, default=1e-4)
+    parser.add_argument("--deep-lasso-reg-weight", type=float, default=0.2)
+    parser.add_argument(
+        "--deep-lasso-selection-metric",
+        type=str,
+        default="val_loss",
+        choices=["val_loss", "val_acc"],
+    )
     parser.add_argument("--adv-rho", type=float, default=0.1)
     parser.add_argument("--adv-alpha", type=float, default=1.0)
     parser.add_argument("--adv-delta", type=float, default=1e-12)
@@ -210,9 +224,34 @@ def run_vanilla_lassonet(
 def run_deep_lasso(
     split: DatasetSplit, seed: int, args: argparse.Namespace, device: torch.device
 ) -> MethodResult:
-    # Note: current repository does not contain a separate Deep-Lasso model.
-    # This method mirrors scripts/run_deep_lasso_tabular.py as it exists now.
-    return run_vanilla_lassonet(split, seed, args, device)
+    pipeline = DeepLassoTabularPipeline(
+        hidden_dim=args.deep_lasso_hidden_dim,
+        depth=args.deep_lasso_depth,
+        dropout=args.deep_lasso_dropout,
+        epochs=args.deep_lasso_epochs,
+        refit_epochs=args.deep_lasso_refit_epochs,
+        batch_size=args.batch_size,
+        lr=args.deep_lasso_lr,
+        weight_decay=args.deep_lasso_weight_decay,
+        reg_weight=args.deep_lasso_reg_weight,
+        selection_metric=args.deep_lasso_selection_metric,
+        device=device,
+    )
+    result = pipeline.run(
+        dataset="benchmark",
+        seed=seed,
+        X_train_valid=np.concatenate((split.X_train, split.X_val), axis=0),
+        y_train_valid=np.concatenate((split.y_train, split.y_val), axis=0),
+        X_test=split.X_test,
+        y_test=split.y_test,
+        k=args.k,
+    )
+    return MethodResult(
+        selected_count=int(result.selected_count),
+        val_score=float(result.refit_val_score),
+        test_score=float(result.test_score),
+        selected_lambda=None,
+    )
 
 
 def run_proposed_method(
@@ -361,10 +400,6 @@ def main(args=None) -> None:
     print(f"Device: {device}")
     print(f"Datasets: {datasets}")
     print(f"Methods: {[METHOD_LABELS[name] for name in METHOD_ORDER]}")
-    print(
-        "Warning: current repo has no separate Deep-Lasso model implementation; "
-        "Deep-Lasso in this benchmark mirrors scripts/run_deep_lasso_tabular.py."
-    )
 
     run_rows: List[Dict[str, object]] = []
 

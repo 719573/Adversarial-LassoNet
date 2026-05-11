@@ -1,14 +1,14 @@
-## 复现建议
+## Reproduction Guidelines
 
-为了让 reviewer 或读者快速复现，建议统一按照以下流程：
+For reviewers and readers, the recommended reproduction workflow is:
 
-1. 安装依赖。
-2. 将原始数据放到 `data/` 下。
-3. 直接运行 `experiments/` 中对应实验脚本。
-4. 所有结果保存到 `outputs/exp*/` 中。
+1. Install the project dependencies.
+2. Place the required raw datasets under `data/` or set `LASSONET_DATA_DIR`.
+3. Launch the target experiment from `experiments/`.
+4. Collect outputs from `outputs/exp*/`.
 
-后续建议补充：
+For rigorous reproduction, the following metadata should be recorded alongside the results:
 
-- 每个实验的固定随机种子列表。
-- 每个表格和图片对应的生成脚本。
-- 环境版本信息，例如 Python、PyTorch、CUDA。
+- The random seeds used for each run
+- The exact script used to generate each reported table or figure
+- Environment information such as Python, PyTorch, and CUDA versions

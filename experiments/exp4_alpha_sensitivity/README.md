@@ -1,8 +1,8 @@
-## 实验 4：`alpha` 敏感性
+## Experiment 4: `alpha` Sensitivity
 
-本实验考察 `adv_alpha` 对准确率和特征选择稳定性的影响。
+This experiment studies the sensitivity of model accuracy and feature-selection stability to `adv_alpha`.
 
-运行示例：
+Example command:
 
 ```bash
 python experiments/exp4_alpha_sensitivity/run_alpha_sweep.py \
